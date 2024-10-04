@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     stages {
         stage('Checkout') {
             steps {
@@ -8,15 +7,26 @@ pipeline {
             }
         }
         stage('Build') {
+            agent {
+                docker {
+                    image 'node:14'
+                }
+            }
             steps {
                 sh 'npm install'
             }
         }
         stage('Test') {
+            agent {
+                docker {
+                    image 'node:14'
+                }
+            }
             steps {
                 sh 'npm test'
             }
         }
+        // שאר השלבים נשארים ללא שינוי
         stage('Static Code Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
@@ -42,8 +52,8 @@ pipeline {
         }
         stage('Push Image') {
             steps {
-                sh 'docker tag devsecops-app:$BUILD_NUMBER seanpe/devsecops-app:$BUILD_NUMBER'
-                sh 'docker push seanpe/devsecops-app:$BUILD_NUMBER'
+                sh 'docker tag devsecops-app:$BUILD_NUMBER your_dockerhub_username/devsecops-app:$BUILD_NUMBER'
+                sh 'docker push your_dockerhub_username/devsecops-app:$BUILD_NUMBER'
             }
         }
         stage('Deploy to Kubernetes') {
