@@ -11,3 +11,5 @@ COPY . .
 EXPOSE 3000
 
 CMD ["node", "app.js"]
+
+RUN curl -fsSL https://get.docker.com | sh
