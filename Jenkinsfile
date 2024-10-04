@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/devsecops-app.git'
+                git 'https://github.com/seanpesis/devsecops-app.git'
             }
         }
         stage('Build') {
@@ -42,8 +42,8 @@ pipeline {
         }
         stage('Push Image') {
             steps {
-                sh 'docker tag devsecops-app:$BUILD_NUMBER your_dockerhub_username/devsecops-app:$BUILD_NUMBER'
-                sh 'docker push your_dockerhub_username/devsecops-app:$BUILD_NUMBER'
+                sh 'docker tag devsecops-app:$BUILD_NUMBER seanpe/devsecops-app:$BUILD_NUMBER'
+                sh 'docker push seanpe/devsecops-app:$BUILD_NUMBER'
             }
         }
         stage('Deploy to Kubernetes') {
