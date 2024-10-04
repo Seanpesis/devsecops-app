@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devsecops-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: devsecops-app
+  template:
+    metadata:
+      labels:
+        app: devsecops-app
+    spec:
+      containers:
+      - name: devsecops-app
+        image: seanpe/devsecops-app:latest
+        ports:
+        - containerPort: 3000
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+          allowPrivilegeEscalation: false
