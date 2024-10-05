@@ -19,7 +19,7 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
 # התקנת Docker CLI
 RUN apt-get update && apt-get install -y docker-ce-cli
 
-# התקנת Node.js ו-NPM
+# התקנת Node.js ו-npm
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install -y nodejs
 
@@ -33,4 +33,5 @@ RUN groupadd docker && usermod -aG docker jenkins
 # הוספת /usr/local/bin ל-PATH
 ENV PATH=$PATH:/usr/local/bin
 
+# מעבר חזרה למשתמש jenkins
 USER jenkins
