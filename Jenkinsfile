@@ -1,6 +1,11 @@
 pipeline {
     agent any
-
+    agent {
+        docker {
+            image 'jenkins-docker'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
     stages {
         stage('Checkout') {
             steps {
