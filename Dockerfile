@@ -20,15 +20,13 @@ RUN apt-get update && apt-get install -y \
 # שלב 4: התקנת Docker CLI
 # הוספת המפתח הציבורי של Docker והוספת מאגר Docker לרשימת המקורות
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
-    && add-apt-repository \
-       "deb [arch=amd64] https://download.docker.com/linux/debian \
-       $(lsb_release -cs) stable" \
+    && echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list \
     && apt-get update && apt-get install -y docker-ce-cli \
     && rm -rf /var/lib/apt/lists/*
 
 # שלב 5: התקנת Node.js ו-NPM מ-NodeSource
-# כאן נשתמש בגרסה 16.x של Node.js, ניתן לשנות לפי הצורך
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+# אנו נשתמש בגרסה 20.x של Node.js, שהיא גרסת LTS מומלצת
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
@@ -47,17 +45,10 @@ RUN groupadd docker && usermod -aG docker jenkins
 # שלב 9: עדכון PATH כדי לכלול את /usr/local/bin
 ENV PATH=$PATH:/usr/local/bin
 
-# שלב 10: חזרה למשתמש jenkins
+# שלב 10: שינוי בעלות על /var/jenkins_home למשתמש jenkins
+RUN chown -R jenkins:jenkins /var/jenkins_home
+
+# שלב 11: חזרה למשתמש jenkins
 USER jenkins
-
-# שלב 11: הגדרת משתני סביבה ל-DNS (אופציונלי)
-# ניתן לשנות את הערכים לפי הצורך או להסיר אם כבר מוגדרים בסביבה
-ENV DNS1=8.8.8.8 \
-    DNS2=8.8.4.4
-
-# שלב 12: התקנת תוספים נוספים ב-Jenkins (אופציונלי)
-# ניתן להוסיף תוספים נוספים כאן אם נדרש
-# למשל:
-# RUN jenkins-plugin-cli --plugins "git docker-plugin"
 
 # סיום
