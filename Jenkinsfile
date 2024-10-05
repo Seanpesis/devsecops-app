@@ -2,11 +2,12 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/seanpesis/devsecops-app.git'
-            }
-        }
+stage('Checkout') {
+    steps {
+        git credentialsId: 'github-token', url: 'https://github.com/seanpesis/devsecops-app.git'
+    }
+}
+
         stage('Build') {
             steps {
                 sh 'npm install'
