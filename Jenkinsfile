@@ -1,10 +1,6 @@
 pipeline {
-    agent {
-        docker {
-            image 'jenkins-docker'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
+
     stages {
         stage('Checkout') {
             steps {
@@ -12,21 +8,11 @@ pipeline {
             }
         }
         stage('Build') {
-            agent {
-                docker {
-                    image 'node:14'
-                }
-            }
             steps {
                 sh 'npm install'
             }
         }
         stage('Test') {
-            agent {
-                docker {
-                    image 'node:14'
-                }
-            }
             steps {
                 sh 'npm test'
             }
@@ -38,8 +24,8 @@ pipeline {
                     sonar-scanner \
                       -Dsonar.projectKey=devsecops-app \
                       -Dsonar.sources=. \
-                      -Dsonar.host.url=$SONARQUBE_URL \
-                      -Dsonar.login=$SONARQUBE_AUTH_TOKEN
+                      -Dsonar.host.url=$SONAR_HOST_URL \
+                      -Dsonar.login=$SONAR_AUTH_TOKEN
                     '''
                 }
             }
@@ -57,7 +43,7 @@ pipeline {
         stage('Push Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                    sh 'docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
+                    sh 'echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin'
                     sh 'docker tag devsecops-app:$BUILD_NUMBER $DOCKERHUB_USERNAME/devsecops-app:$BUILD_NUMBER'
                     sh 'docker push $DOCKERHUB_USERNAME/devsecops-app:$BUILD_NUMBER'
                 }
