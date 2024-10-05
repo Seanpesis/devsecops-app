@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-token', url: 'https://github.com/seanpesis/devsecops-app.git'
+                git credentialsId: 'github-token', url: 'https://github.com/seanpesis/devsecops-app.git', branch: 'master'
             }
         }
         stage('Build') {
