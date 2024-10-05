@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+tools {
+        nodejs "nodejs-20" // שם ההתקנה שהגדרת במנהל הכלים
+    }
     stages {
         stage('Checkout') {
             steps {
