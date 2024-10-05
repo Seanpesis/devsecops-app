@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,7 +11,6 @@ pipeline {
             agent {
                 docker {
                     image 'node:14'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps {
@@ -21,7 +21,6 @@ pipeline {
             agent {
                 docker {
                     image 'node:14'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps {
@@ -53,8 +52,11 @@ pipeline {
         }
         stage('Push Image') {
             steps {
-                sh 'docker tag devsecops-app:$BUILD_NUMBER seanpe/devsecops-app:$BUILD_NUMBER'
-                sh 'docker push seanpe/devsecops-app:$BUILD_NUMBER'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    sh 'docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
+                    sh 'docker tag devsecops-app:$BUILD_NUMBER $DOCKERHUB_USERNAME/devsecops-app:$BUILD_NUMBER'
+                    sh 'docker push $DOCKERHUB_USERNAME/devsecops-app:$BUILD_NUMBER'
+                }
             }
         }
         stage('Deploy to Kubernetes') {
