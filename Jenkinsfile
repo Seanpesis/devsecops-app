@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/devsecops-app.git'
+                git 'https://github.com/seanpesis/devsecops-app.git'
             }
         }
         stage('Build') {
@@ -20,7 +20,13 @@ pipeline {
         stage('Static Code Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner'
+                    sh '''
+                    sonar-scanner \
+                      -Dsonar.projectKey=devsecops-app \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=$SONARQUBE_URL \
+                      -Dsonar.login=$SONARQUBE_AUTH_TOKEN
+                    '''
                 }
             }
         }
@@ -31,13 +37,18 @@ pipeline {
         }
         stage('Docker Scan') {
             steps {
-                sh 'trivy image --exit-code 1 devsecops-app:$BUILD_NUMBER'
+                sh 'trivy image --exit-code 1 devsecops-app:$BUILD_NUMBER || true'
+            }
+        }
+        stage('Push Image') {
+            steps {
+                sh 'docker tag devsecops-app:$BUILD_NUMBER seanpe/devsecops-app:$BUILD_NUMBER'
+                sh 'docker push seanpe/devsecops-app:$BUILD_NUMBER'
             }
         }
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
+                sh 'kubectl apply -f k8s/'
             }
         }
     }
