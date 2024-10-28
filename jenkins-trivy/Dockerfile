@@ -2,7 +2,6 @@ FROM jenkins/jenkins:lts
 
 USER root
 
-# התקנת Trivy
 RUN apt-get update && \
     apt-get install -y wget apt-transport-https gnupg lsb-release && \
     wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add - && \
@@ -10,7 +9,6 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y trivy
 
-# התקנת Docker CLI
 RUN curl -fsSL https://get.docker.com | sh
 
 USER jenkins
